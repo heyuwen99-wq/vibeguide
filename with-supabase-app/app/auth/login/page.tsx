@@ -1,10 +1,35 @@
 import { LoginForm } from "@/components/login-form";
+import { Lock } from "lucide-react";
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <LoginForm />
+    <div className="relative flex min-h-svh w-full items-center justify-center p-6 md:p-10 overflow-hidden">
+      {/* 网格背景 */}
+      <div className="absolute inset-0 tech-grid opacity-30" />
+
+      {/* 渐变光晕 */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px] animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[128px] animate-pulse delay-1000" />
+
+      {/* 装饰性图标 */}
+      <div className="absolute top-10 right-10 text-primary/10 animate-bounce">
+        <Lock size={80} />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* 标题 */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <h1 className="text-4xl font-bold font-orbitron text-gradient-cyber mb-2">
+            欢迎回来
+          </h1>
+          <p className="text-muted-foreground">登录到您的账户</p>
+        </div>
+
+        {/* 登录表单卡片 */}
+        <div className="relative border border-primary/30 rounded-xl p-8 bg-card/50 backdrop-blur-md shadow-2xl glow-cyan animate-fade-in-up delay-100">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+          <LoginForm />
+        </div>
       </div>
     </div>
   );

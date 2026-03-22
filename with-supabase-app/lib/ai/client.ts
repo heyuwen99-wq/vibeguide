@@ -20,11 +20,13 @@ export async function generateQuestions(description: string): Promise<string[]> 
 
 ${description}
 
-请根据这个描述，生成 3-5 个深入的问题，帮助更好地理解项目需求。问题应该涵盖：
-1. 目标用户和使用场景
-2. 核心功能和业务逻辑
-3. 技术实现细节
-4. 数据模型和流程
+请根据这个描述，生成 5-7 个深入的问题，帮助更好地理解项目需求。问题应该涵盖：
+1. 项目背景和目标 - 为什么做这个项目？解决什么问题？
+2. 目标用户和使用场景 - 谁会用？在什么场景下使用？
+3. 核心功能和业务逻辑 - 主要功能有哪些？业务流程如何？
+4. UI/UX 和交互设计 - 界面风格？用户体验要求？
+5. 技术实现和架构 - 技术栈选型？系统架构？
+6. 数据模型和非功能需求 - 数据如何组织？性能、安全要求？
 
 请直接返回问题列表，每行一个问题，使用数字编号（1. 2. 3. ...）。不要包含任何其他内容。`;
 
@@ -37,7 +39,7 @@ ${description}
       },
     ],
     temperature: 0.7,
-    max_tokens: 1000,
+    max_tokens: 2000,
   });
 
   const content = completion.choices[0]?.message?.content || '';
@@ -177,31 +179,31 @@ ${answers}`;
         model: MODEL,
         messages: [{ role: 'user', content: prompts.userJourney }],
         temperature: 0.7,
-        max_tokens: 4000,
+        max_tokens: 16000,
       }),
       openai.chat.completions.create({
         model: MODEL,
         messages: [{ role: 'user', content: prompts.prd }],
         temperature: 0.7,
-        max_tokens: 4000,
+        max_tokens: 8000,
       }),
       openai.chat.completions.create({
         model: MODEL,
         messages: [{ role: 'user', content: prompts.frontend }],
         temperature: 0.7,
-        max_tokens: 4000,
+        max_tokens: 8000,
       }),
       openai.chat.completions.create({
         model: MODEL,
         messages: [{ role: 'user', content: prompts.backend }],
         temperature: 0.7,
-        max_tokens: 4000,
+        max_tokens: 8000,
       }),
       openai.chat.completions.create({
         model: MODEL,
         messages: [{ role: 'user', content: prompts.database }],
         temperature: 0.7,
-        max_tokens: 4000,
+        max_tokens: 8000,
       }),
     ]);
 

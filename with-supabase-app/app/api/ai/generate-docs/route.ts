@@ -25,7 +25,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check user credits
+    // TEST MODE: Skip credit check and deduction
+    // TODO: Uncomment for production
+    /*
     const userRecords = await db
       .select()
       .from(users)
@@ -44,13 +46,15 @@ export async function POST(request: NextRequest) {
         { status: 402 }
       );
     }
+    */
 
     // Generate documents
     const documents = await generateDocuments(description, answers);
 
-    // Update project and deduct credits in a transaction
+    // Update project (no credit deduction in test mode)
     await db.transaction(async (tx) => {
-      // Deduct 1 credit
+      // TEST MODE: Credit deduction disabled
+      /*
       await tx
         .update(users)
         .set({
@@ -58,6 +62,7 @@ export async function POST(request: NextRequest) {
           updatedAt: new Date(),
         })
         .where(eq(users.id, user.id));
+      */
 
       // Update project with documents
       if (projectId) {

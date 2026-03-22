@@ -57,6 +57,15 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        'orbitron': ['Orbitron', 'sans-serif'],
+        'rajdhani': ['Rajdhani', 'sans-serif'],
+      },
+      animation: {
+        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'scan': 'scan 4s linear infinite',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

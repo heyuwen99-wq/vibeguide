@@ -31,22 +31,30 @@ export default async function DashboardLayout({
   const credits = userData?.projectCredits || 0;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen relative">
+      {/* 全局背景装饰 */}
+      <div className="fixed inset-0 tech-grid opacity-20 pointer-events-none" />
+      <div className="fixed top-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[128px] animate-pulse pointer-events-none" />
+      <div className="fixed bottom-0 left-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[128px] animate-pulse delay-1000 pointer-events-none" />
+
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative">
         {/* Top bar */}
-        <header className="border-b h-16 flex items-center justify-end px-6 gap-4">
+        <header className="border-b border-primary/20 h-16 flex items-center justify-end px-6 gap-4 bg-card/30 backdrop-blur-md relative">
+          {/* 顶部装饰线 */}
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
           <CreditsBadge credits={credits} />
-          <Avatar>
-            <AvatarFallback>
+          <Avatar className="border-2 border-primary/30 shadow-lg shadow-primary/20">
+            <AvatarFallback className="bg-primary/20 text-primary font-bold">
               {user.email?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <form action="/auth/signout" method="post">
-            <Button variant="ghost" size="sm" type="submit">
+            <Button variant="ghost" size="sm" type="submit" className="hover:bg-primary/10 hover:text-primary transition-all duration-300">
               <LogOut className="h-4 w-4 mr-2" />
               退出
             </Button>
@@ -54,7 +62,7 @@ export default async function DashboardLayout({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6 relative overflow-auto">{children}</main>
       </div>
     </div>
   );

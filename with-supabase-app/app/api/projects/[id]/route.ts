@@ -87,3 +87,43 @@ export async function PATCH(
     );
   }
 }
+
+// DELETE: Delete project
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify project ownership before deletion
+    const projectRecords = await db
+      .select()
+      .from(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, user.id)))
+      .limit(1);
+
+    if (projectRecords.length === 0) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+
+    // Delete project
+    await db.delete(projects).where(eq(projects.id, id));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete project error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -39,28 +39,41 @@ const faqs = [
 
 export function FaqSection() {
   return (
-    <section className="container mx-auto px-4 py-24">
-      <div className="mx-auto max-w-3xl">
+    <section className="relative container mx-auto px-4 py-24 overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[128px] animate-pulse" />
+
+      <div className="relative mx-auto max-w-3xl">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl font-orbitron text-gradient-cyber">
             常见问题
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            了解更多关于 VibeGuide 的信息
+            了解更多关于 <span className="text-primary font-semibold">VibeGuide</span> 的信息
           </p>
         </div>
-        <Accordion type="single" collapsible className="w-full">
-          {faqs.map((faq, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+
+        <div className="relative border border-primary/20 rounded-xl p-6 bg-card/30 backdrop-blur-sm shadow-lg">
+          {/* 顶部装饰线 */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent rounded-t-xl" />
+
+          <Accordion type="single" collapsible className="w-full space-y-2">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="border border-primary/10 rounded-lg px-6 bg-card/20 hover:bg-card/40 hover:border-primary/30 transition-all duration-300"
+              >
+                <AccordionTrigger className="text-left font-rajdhani font-bold hover:text-primary hover:no-underline transition-colors duration-300">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </div>
     </section>
   );

@@ -6,7 +6,7 @@ if (!process.env.ZPAY_PID || !process.env.ZPAY_KEY) {
 
 const ZPAY_PID = process.env.ZPAY_PID;
 const ZPAY_KEY = process.env.ZPAY_KEY;
-const ZPAY_API_URL = 'https://api.zpay.com/create'; // TODO: Replace with actual Zpay API endpoint
+const ZPAY_API_URL = 'https://zpayz.cn/submit.php';
 
 export interface CreatePaymentParams {
   outTradeNo: string; // Merchant order number
@@ -24,29 +24,35 @@ export interface PaymentNotifyParams {
   name: string;
   money: string;
   trade_status: string;
+  param?: string;
   sign: string;
   sign_type: string;
 }
 
 /**
  * Generate MD5 signature for Zpay
+ * Algorithm: Sort params by key, concatenate as key=value&key=value, append KEY, then MD5
  */
 function generateSign(params: Record<string, string>): string {
-  // Sort params alphabetically and concatenate
-  const sortedKeys = Object.keys(params).sort();
+  // Sort params alphabetically (a-z), exclude sign and sign_type
+  const sortedKeys = Object.keys(params)
+    .filter(key => key !== 'sign' && key !== 'sign_type' && params[key])
+    .sort();
+
+  // Concatenate as key=value&key=value format
   const signString = sortedKeys
     .map(key => `${key}=${params[key]}`)
     .join('&') + ZPAY_KEY;
 
-  return crypto.createHash('md5').update(signString).digest('hex');
+  // MD5 hash (lowercase)
+  return crypto.createHash('md5').update(signString).digest('hex').toLowerCase();
 }
 
 /**
- * Create payment URL
- * TODO: Update with actual Zpay API documentation
+ * Create payment URL for Zpay page redirect
  */
 export async function createPaymentUrl(params: CreatePaymentParams): Promise<string> {
-  const requestParams = {
+  const requestParams: Record<string, string> = {
     pid: ZPAY_PID,
     type: params.type,
     out_trade_no: params.outTradeNo,
@@ -78,8 +84,16 @@ export function verifyNotify(params: PaymentNotifyParams): boolean {
     return false;
   }
 
-  const expectedSign = generateSign(otherParams as Record<string, string>);
-  return sign === expectedSign;
+  // Filter out empty values
+  const filteredParams: Record<string, string> = {};
+  for (const [key, value] of Object.entries(otherParams)) {
+    if (value) {
+      filteredParams[key] = String(value);
+    }
+  }
+
+  const expectedSign = generateSign(filteredParams);
+  return sign.toLowerCase() === expectedSign.toLowerCase();
 }
 
 /**

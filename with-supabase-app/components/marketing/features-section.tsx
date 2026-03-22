@@ -30,32 +30,84 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="container mx-auto px-4 py-24">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+    <section className="relative container mx-auto px-4 py-24 overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute top-1/2 left-0 w-96 h-96 bg-primary/5 rounded-full blur-[128px] animate-pulse" />
+
+      <div className="relative mx-auto max-w-2xl text-center mb-16">
+        <h2 className="text-4xl font-bold tracking-tight sm:text-5xl font-orbitron text-gradient-cyber">
           一站式文档生成
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          从需求到实施，5 种专业文档助力您的项目成功
+          从需求到实施，<span className="text-primary font-semibold">5 种专业文档</span>助力您的项目成功
         </p>
       </div>
-      <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((feature, index) => {
+
+      {/* 第一行：2个主要功能卡片（较大） */}
+      <div className="relative mt-16 grid gap-8 md:grid-cols-2 max-w-4xl mx-auto mb-8">
+        {features.slice(0, 2).map((feature, index) => {
           const Icon = feature.icon;
+          const delay = index * 100;
           return (
             <div
               key={index}
-              className="relative rounded-lg border p-6 hover:shadow-lg transition-shadow"
+              className="group relative rounded-xl border border-primary/20 p-8 bg-card/30 backdrop-blur-sm hover:border-primary/50 hover:bg-card/60 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 opacity-0 animate-fade-in-up"
+              style={{ animationDelay: `${delay}ms` }}
             >
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Icon className="h-6 w-6 text-primary" />
+              {/* 顶部装饰线 */}
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              {/* 角落光晕 */}
+              <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              <div className="relative">
+                <div className="mb-6">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/20 border border-primary/30 shadow-lg shadow-primary/20 group-hover:bg-primary/30 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-110 mb-4">
+                    <Icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-2xl font-rajdhani group-hover:text-primary transition-colors duration-300">
+                    {feature.title}
+                  </h3>
                 </div>
-                <h3 className="font-semibold">{feature.title}</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {feature.description}
-              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 第二行：3个次要功能卡片（较小） */}
+      <div className="relative grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+        {features.slice(2).map((feature, index) => {
+          const Icon = feature.icon;
+          const delay = (index + 2) * 100;
+          return (
+            <div
+              key={index + 2}
+              className="group relative rounded-xl border border-primary/20 p-6 bg-card/30 backdrop-blur-sm hover:border-primary/50 hover:bg-card/60 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 opacity-0 animate-fade-in-up"
+              style={{ animationDelay: `${delay}ms` }}
+            >
+              {/* 顶部装饰线 */}
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              {/* 角落光晕 */}
+              <div className="absolute -top-10 -right-10 w-20 h-20 bg-primary/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              <div className="relative">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/20 border border-primary/30 group-hover:bg-primary/30 group-hover:shadow-lg group-hover:shadow-primary/50 transition-all duration-300">
+                    <Icon className="h-7 w-7 text-primary group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <h3 className="font-bold text-lg font-rajdhani group-hover:text-primary transition-colors duration-300">
+                    {feature.title}
+                  </h3>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
             </div>
           );
         })}

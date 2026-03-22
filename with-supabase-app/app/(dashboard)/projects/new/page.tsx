@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { StepIndicator } from '@/components/dashboard/step-indicator';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,7 +15,11 @@ import { MarkdownRenderer } from '@/components/shared/markdown-renderer';
 import { downloadMarkdown, downloadAllAsZip } from '@/lib/utils/download';
 import { toast } from 'sonner';
 
-const STEPS = ['描述项目', '深入需求', '生成文档'];
+const STEPS = [
+  { title: '描述项目', description: '详细描述你的项目想法' },
+  { title: '深入需求', description: '回答AI生成的深入问题' },
+  { title: '创建文档', description: '生成和查看项目文档' },
+];
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -22,6 +27,7 @@ export default function NewProjectPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Step 1
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
   // Step 2
@@ -40,15 +46,10 @@ export default function NewProjectPage() {
   const [progress, setProgress] = useState(0);
   const [projectId, setProjectId] = useState<string | null>(null);
 
-  const handleStep1Next = async () => {
-    if (description.length < 20) {
-      toast.error('项目描述至少需要 20 个字符');
-      return;
-    }
-
+  const generateQuestions = async () => {
     setIsLoading(true);
     try {
-      // Generate questions
+      // Production mode: Call OpenRouter API
       const response = await fetch('/api/ai/generate-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,14 +61,59 @@ export default function NewProjectPage() {
       }
 
       const data = await response.json();
-      setQuestions(data.questions);
-      setCurrentStep(2);
+      console.log('API Response:', data);
+      console.log('Questions:', data.questions);
+
+      if (data.questions && Array.isArray(data.questions)) {
+        setQuestions(data.questions);
+        console.log('Questions set to state:', data.questions);
+        return true;
+      } else {
+        console.error('Invalid questions format:', data);
+        toast.error('问题格式错误');
+        return false;
+      }
+
+      /* Test mode - use preset questions (comment out above code to enable):
+      const testQuestions = [
+        '项目的目标用户群体是谁？他们的主要特征和痛点是什么？',
+        '核心功能的业务流程是怎样的？用户如何与系统交互？',
+        '项目需要哪些关键技术栈？是否有特殊的技术要求或限制？',
+        '数据如何存储和管理？是否需要考虑数据安全和隐私保护？',
+        '项目的商业模式或盈利方式是什么？如何衡量项目成功？',
+      ];
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setQuestions(testQuestions);
+      console.log('Test mode: Using preset questions');
+      return true;
+      */
     } catch (error) {
-      console.error(error);
+      console.error('Generate questions error:', error);
       toast.error('生成问题失败，请重试');
+      return false;
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleStep1Next = async () => {
+    if (!title.trim()) {
+      toast.error('请输入项目标题');
+      return;
+    }
+    if (description.length < 20) {
+      toast.error('项目描述至少需要 20 个字符');
+      return;
+    }
+
+    const success = await generateQuestions();
+    if (success) {
+      setCurrentStep(2);
+    }
+  };
+
+  const handleRegenerateQuestions = async () => {
+    await generateQuestions();
   };
 
   const handleStep2Next = async () => {
@@ -85,7 +131,7 @@ export default function NewProjectPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: description.slice(0, 50),
+          title: title,
           step1Description: description,
           step2Questions: questions,
           step2Answers: answers,
@@ -155,6 +201,13 @@ export default function NewProjectPage() {
     router.push('/projects');
   };
 
+  const handleRegenerateDocuments = async () => {
+    if (!projectId) return;
+    setDocuments(null);
+    setIsLoading(true);
+    await generateDocuments(projectId);
+  };
+
   const handleDownloadSingle = (docName: string, content: string) => {
     downloadMarkdown(docName, content);
     toast.success('下载成功');
@@ -167,11 +220,15 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">创建新项目</h1>
-        <p className="text-muted-foreground mt-2">
-          使用 AI Agent 辅助您完成专业的项目需求分析
+    <div className="max-w-5xl mx-auto relative">
+      {/* 背景装饰 */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-[128px] animate-pulse pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-secondary/10 rounded-full blur-[128px] animate-pulse delay-1000 pointer-events-none" />
+
+      <div className="relative mb-8">
+        <h1 className="text-4xl font-bold font-orbitron text-gradient-cyber">创建新项目</h1>
+        <p className="text-muted-foreground mt-2 text-lg">
+          使用 <span className="text-primary font-semibold">AI Agent</span> 辅助您完成专业的项目需求分析
         </p>
       </div>
 
@@ -179,37 +236,72 @@ export default function NewProjectPage() {
 
       {/* Step 1: Project Description */}
       {currentStep === 1 && (
-        <div className="space-y-6">
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              项目描述 <span className="text-destructive">*</span>
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="请详细描述您的项目想法，包括项目目标、主要功能、目标用户等（至少 20 个字符）..."
-              rows={10}
-              className="resize-none"
-            />
-            <p className="text-sm text-muted-foreground mt-2">
-              {description.length} / 20 字符
+        <div className="relative border border-primary/30 rounded-xl p-8 bg-card/50 backdrop-blur-sm shadow-lg glow-cyan animate-fade-in-up">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold mb-2 font-rajdhani">步骤1: 描述项目</h3>
+            <p className="text-muted-foreground">
+              请详细描述你的项目想法，包括功能需求、目标用户等信息
             </p>
           </div>
-          <Button
-            size="lg"
-            onClick={handleStep1Next}
-            disabled={isLoading || description.length < 20}
-          >
-            {isLoading ? '生成问题中...' : '下一步'}
-          </Button>
+
+          <div className="space-y-6">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                项目标题
+              </label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="例如：AI智能记账助手"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                项目描述（至少20个字符）
+              </label>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="例如：一款面向年轻上班族和学生群体的AI记账工具，支持语音/图片自动识别收支、智能分类消费类型、生成月度财务分析报告，帮助用户轻松管理个人财务，培养理性消费习惯。"
+                rows={10}
+                className="resize-none"
+              />
+              <p className="text-sm text-muted-foreground mt-2">
+                {description.length} / 20 字符
+              </p>
+            </div>
+
+            <Button
+              size="lg"
+              onClick={handleStep1Next}
+              disabled={isLoading || !title.trim() || description.length < 20}
+            >
+              {isLoading ? '生成问题中...' : '下一步'}
+            </Button>
+          </div>
         </div>
       )}
 
       {/* Step 2: Deep Requirements */}
       {currentStep === 2 && (
-        <div className="space-y-6">
+        <div className="relative border border-primary/30 rounded-xl p-8 bg-card/50 backdrop-blur-sm shadow-lg glow-cyan animate-fade-in-up space-y-6">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
           <div>
-            <h3 className="text-lg font-semibold mb-4">AI 生成的深入问题</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-bold font-rajdhani">AI 生成的深入问题</h3>
+              {questions.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRegenerateQuestions}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '生成中...' : '换一批'}
+                </Button>
+              )}
+            </div>
             {questions.length === 0 ? (
               <div className="space-y-2">
                 <Skeleton className="h-4 w-full" />
@@ -255,7 +347,8 @@ export default function NewProjectPage() {
 
       {/* Step 3: Document Creation */}
       {currentStep === 3 && (
-        <div className="space-y-6">
+        <div className="relative border border-primary/30 rounded-xl p-8 bg-card/50 backdrop-blur-sm shadow-lg glow-cyan animate-fade-in-up space-y-6">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
           {isLoading || !documents ? (
             <div>
               <Progress value={progress} className="mb-4" />
@@ -356,7 +449,22 @@ export default function NewProjectPage() {
                 </TabsContent>
               </Tabs>
 
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-wrap">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => setCurrentStep(2)}
+                >
+                  返回上一页
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={handleRegenerateDocuments}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '重新生成中...' : '重新生成'}
+                </Button>
                 <Button size="lg" onClick={handleDownloadAll}>
                   批量下载 ZIP
                 </Button>
