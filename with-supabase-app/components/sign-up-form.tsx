@@ -39,7 +39,27 @@ export function SignUpForm({
       return;
     }
 
+    if (password.length < 6) {
+      setError("密码长度至少6位");
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      // 先检查邮箱是否已注册
+      const checkResponse = await fetch("/api/auth/check-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const checkData = await checkResponse.json();
+
+      if (checkData.exists) {
+        setError("该邮箱已注册，请直接登录");
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -50,7 +70,13 @@ export function SignUpForm({
       if (error) throw error;
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      const message = error instanceof Error ? error.message : "发生错误";
+      const errorMap: Record<string, string> = {
+        "User already registered": "该邮箱已注册",
+        "Password should be at least 6 characters": "密码长度至少6位",
+        "Unable to validate email address: invalid format": "邮箱格式不正确",
+      };
+      setError(errorMap[message] || message);
     } finally {
       setIsLoading(false);
     }
