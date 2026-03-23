@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AuthButton } from '@/components/auth-button';
 import { Zap } from 'lucide-react';
+import { NavLinks } from './nav-links';
 
 export function MarketingNav() {
   return (
@@ -19,22 +20,7 @@ export function MarketingNav() {
             </span>
           </Link>
         </div>
-        <nav className="flex flex-1 items-center space-x-6 text-sm font-medium font-rajdhani">
-          <Link
-            href="/"
-            className="relative transition-all duration-300 hover:text-primary text-foreground group"
-          >
-            首页
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
-          </Link>
-          <Link
-            href="/pricing"
-            className="relative transition-all duration-300 hover:text-primary text-foreground/80 group"
-          >
-            价格
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
-          </Link>
-        </nav>
+        <NavLinks />
         <div className="flex items-center gap-4">
           <AuthButton />
         </div>

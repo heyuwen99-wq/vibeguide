@@ -183,7 +183,7 @@ export default function PaymentPage() {
         </Button>
 
         <div className="text-center mt-6 animate-fade-in-up delay-400">
-          <Button variant="ghost" onClick={() => router.push('/pricing')} className="hover:text-primary transition-colors duration-300">
+          <Button variant="ghost" onClick={() => router.push('/pricing')} className="hover:bg-primary/20 hover:text-foreground transition-colors duration-300">
             返回价格页面
           </Button>
         </div>

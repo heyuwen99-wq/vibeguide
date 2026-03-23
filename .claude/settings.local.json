@@ -11,7 +11,12 @@
       "Bash(pnpm drizzle-kit:*)",
       "Bash(pnpm build:*)",
       "Bash(pnpm tsc:*)",
-      "Bash(pnpm next build:*)"
+      "Bash(pnpm next build:*)",
+      "Bash(pnpm dev)",
+      "Bash(ls:*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

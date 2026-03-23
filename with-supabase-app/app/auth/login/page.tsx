@@ -1,5 +1,8 @@
+import Link from "next/link";
 import { LoginForm } from "@/components/login-form";
-import { Lock } from "lucide-react";
+import { Lock, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DeleteAccountSection } from "@/components/delete-account-section";
 
 export default function Page() {
   return (
@@ -16,6 +19,16 @@ export default function Page() {
         <Lock size={80} />
       </div>
 
+      {/* 返回主页按钮 */}
+      <div className="absolute top-6 left-6 z-50">
+        <Button variant="outline" asChild className="border-primary/50 hover:bg-primary/20 hover:border-primary">
+          <Link href="/">
+            <Home className="mr-2 h-4 w-4" />
+            返回主页
+          </Link>
+        </Button>
+      </div>
+
       <div className="relative w-full max-w-md">
         {/* 标题 */}
         <div className="text-center mb-8 animate-fade-in-up">
@@ -30,6 +43,9 @@ export default function Page() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
           <LoginForm />
         </div>
+
+        {/* 注销账号 */}
+        <DeleteAccountSection />
       </div>
     </div>
   );

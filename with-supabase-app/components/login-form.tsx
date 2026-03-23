@@ -37,11 +37,38 @@ export function LoginForm({
         email,
         password,
       });
-      if (error) throw error;
+
+      if (error) {
+        // 检查用户是否存在
+        if (error.message === "Invalid login credentials") {
+          const response = await fetch("/api/auth/check-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+          const data = await response.json();
+
+          if (!data.exists) {
+            setError("该邮箱尚未注册");
+            return;
+          }
+          setError("密码错误");
+          return;
+        }
+        throw error;
+      }
+
       // Redirect to projects page after successful login
       router.push("/projects");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      const message = error instanceof Error ? error.message : "发生错误";
+      // 翻译常见错误信息
+      const errorMap: Record<string, string> = {
+        "Email not confirmed": "邮箱尚未验证，请先查收验证邮件",
+        "User not found": "该邮箱尚未注册",
+        "Invalid email or password": "邮箱或密码错误",
+      };
+      setError(errorMap[message] || message);
     } finally {
       setIsLoading(false);
     }

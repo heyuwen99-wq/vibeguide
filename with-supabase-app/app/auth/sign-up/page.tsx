@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { SignUpForm } from "@/components/sign-up-form";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
   return (
@@ -14,6 +16,16 @@ export default function Page() {
       {/* 装饰性图标 */}
       <div className="absolute top-10 left-10 text-primary/10 animate-bounce">
         <UserPlus size={80} />
+      </div>
+
+      {/* 返回主页按钮 */}
+      <div className="absolute top-6 right-6 z-50">
+        <Button variant="outline" asChild className="border-primary/50 hover:bg-primary/20 hover:border-primary">
+          <Link href="/">
+            <Home className="mr-2 h-4 w-4" />
+            返回主页
+          </Link>
+        </Button>
       </div>
 
       <div className="relative w-full max-w-md">

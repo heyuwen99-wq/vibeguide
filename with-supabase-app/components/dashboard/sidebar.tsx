@@ -45,7 +45,10 @@ export function Sidebar() {
       <nav className="space-y-2">
         {navigation.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          // 精确匹配，避免 /projects 和 /projects/new 同时高亮
+          const isActive = pathname === item.href ||
+            (item.href === '/projects' && pathname.startsWith('/projects/') && pathname !== '/projects/new') ||
+            (item.href !== '/projects' && pathname.startsWith(item.href + '/'));
 
           return (
             <Link

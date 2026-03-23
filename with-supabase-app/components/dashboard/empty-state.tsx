@@ -29,7 +29,7 @@ export function EmptyState() {
         <h3 className="text-3xl font-bold mb-3 font-orbitron text-gradient-cyber">
           暂无项目
         </h3>
-        <p className="text-muted-foreground mb-8 max-w-md text-lg leading-relaxed">
+        <p className="text-muted-foreground mb-8 text-sm whitespace-nowrap">
           开始创建您的第一个项目，让 <span className="text-primary font-semibold">AI</span> 帮助您生成专业的开发文档
         </p>
 
