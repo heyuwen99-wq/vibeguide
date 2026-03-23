@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd with-supabase-app && npm run build",
+  "outputDirectory": "with-supabase-app/.next",
+  "installCommand": "cd with-supabase-app && npm install",
+  "framework": "nextjs",
+  "rootDirectory": "with-supabase-app"
+}
