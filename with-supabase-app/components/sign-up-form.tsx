@@ -60,14 +60,23 @@ export function SignUpForm({
         return;
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/projects`,
         },
       });
+
       if (error) throw error;
+
+      // 检查用户是否已存在（Supabase 返回的用户没有 identities 表示已存在）
+      if (data?.user?.identities?.length === 0) {
+        setError("该邮箱已注册，请直接登录");
+        setIsLoading(false);
+        return;
+      }
+
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "发生错误";
